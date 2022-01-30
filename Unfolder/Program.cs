@@ -126,31 +126,55 @@ namespace Unfolder
 
             private string GenerateNextPath(FileInfo fileInfo, DirectoryInfo root)
             {
-                Stack<string> filePathStack = new Stack<string>();
-                filePathStack.Push(fileInfo.Name);
+                //Stack<string> filePathStack = new Stack<string>();
+                Queue<string> filePathQueue = new Queue<string>();
+                filePathQueue.Enqueue(fileInfo.Name);
                 DirectoryInfo parent = fileInfo.Directory;
 
                 while (parent != null && parent.FullName != root.FullName)
                 {
-                    filePathStack.Push(parent.Name);
+                    filePathQueue.Enqueue(parent.Name);
                     parent = parent.Parent;
                 }
 
-                StringBuilder nextPathBuilder = new StringBuilder(); ;
-                while (true)
+                string nextPath;                
+
+                StringBuilder nextPathBuilder = new StringBuilder();
+                if (!cmdParams.UseShorterNames)
                 {
-                    nextPathBuilder.Append(filePathStack.Pop());
-                    if (filePathStack.Count > 0)
+                    while (true)
                     {
-                        nextPathBuilder.Append('-');
-                    }
-                    else
-                    {
-                        break;
+                        nextPathBuilder.Insert(0, filePathQueue.Dequeue());
+                        if (filePathQueue.Count > 0)
+                        {
+                            nextPathBuilder.Insert(0, '-');
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
-
-                string nextPath;
+                else
+                {
+                    while (true)
+                    {
+                        nextPathBuilder.Insert(0, filePathQueue.Dequeue());
+                        if (!File.Exists(Path.Combine(rootDirectoryInfo.FullName, nextPathBuilder.ToString())))
+                        {
+                            break;
+                        }                       
+                        if (filePathQueue.Count > 0)
+                        {
+                            nextPathBuilder.Insert(0, '-');
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                
                 nextPath = nextPathBuilder.ToString();
                 return nextPath;
             }
@@ -159,7 +183,7 @@ namespace Unfolder
             {
                 string nextPath = GenerateNextPath(fileInfo, rootDirectoryInfo);
                 string nextPathAbsolute = Path.Combine(rootDirectoryInfo.FullName, nextPath);
-                
+
                 if (cmdParams.UseAbsolutePathsForRefolding)
                 {
                     nextPaths.Add(nextPathAbsolute);

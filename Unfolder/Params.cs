@@ -23,6 +23,7 @@ namespace Unfolder
         public int Verbosity { get; private set; }
 
         public bool PauseOnFinish { get; private set; }
+        public bool UseShorterNames { get; private set; }
 
         public string GetHelp()
         {
@@ -37,6 +38,7 @@ namespace Unfolder
             stringBuilder.Append("-vX\tVerbosity level, X - number in range [0, 2]\n");
             stringBuilder.Append("-a\tUse absolute paths in .refolding file\n");
             stringBuilder.Append("-p\tPause upon finishing\n");
+            stringBuilder.Append("-s\tUse shorter names");
 
             return stringBuilder.ToString();
         }
@@ -95,6 +97,11 @@ namespace Unfolder
                     if (argument.Contains("h"))
                     {
                         cmdParams.PrintHelp = true;
+                    }
+
+                    if(argument.Contains("s"))
+                    {
+                        cmdParams.UseShorterNames = true;
                     }
                 }
                 else
