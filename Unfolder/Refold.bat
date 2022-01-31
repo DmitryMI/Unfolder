@@ -2,4 +2,6 @@
 
 set /P path="Path: "
 
-Unfolder -r -s %path%
+%~dp0/bin/Release/Unfolder.exe -r -s "%path%"
+
+pause
